@@ -1,32 +1,31 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from pydantic import BaseModel
 from starlette.templating import Jinja2Templates as Jinja2Templates  # noqa
 
 SET_NUMBER = 0
 
 app = FastAPI()
 
+
+class NumberPayload(BaseModel):
+    number: int
+
 @app.get("/")
 async def root():
     return {"message": "Hello World"}
 
-# @app.post("/action/{run}")
-# async def perform_action(run: int):
-#     # Simulate performing an action based on the 'run' parameter
-#     result = f"Action performed for run {run}"
-#     return {"result": result}
-
 @app.get("/template")
-async def render_template():
+async def render_template(request: Request):
     templates = Jinja2Templates(directory="./fastapi_project/templates/")
     return templates.TemplateResponse("index.html", context={
-            "request":{}, 
+            "request": request,
             "content":SET_NUMBER
         })
 
-@app.post("/set_number/{number}")
-async def set_number(number: int):
+@app.post("/set_number/")
+async def set_number(payload: NumberPayload):
     global SET_NUMBER
-    SET_NUMBER = number
+    SET_NUMBER = payload.number
     print(f"Number set to {SET_NUMBER}")
     return {"message": f"Number set to {SET_NUMBER}"}
 

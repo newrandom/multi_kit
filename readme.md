@@ -15,7 +15,7 @@
 
 # module
 - pyside6, fastapi, jinja2, psycopg[binary], uvicorn
-    * `pip install pyside6 fastapi jinja2 "psycopg[binary]" uvicorn`
+    * `pip install pyside6 fastapi jinja2 "psycopg[binary]" uvicorn requests`
 
 # action
 - btnRun

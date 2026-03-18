@@ -6,12 +6,19 @@
     <title>Hello Button</title>
 </head>
 <body>
-    <button id="btnClick">Click Me!</button>
-    <p id="content" style="display: none;">{{content}}</p>
+    <div>
+        <button id="btnClick">get number</button>
+        <button id="setContent">set number</button>
+        <input type="text" id="inputContent" placeholder="Enter number">
+        <!-- <p id="content" style="display: none;">{{content}}</p> -->
+    </div>
 </body>
 <script>
+    const inputContent = document.getElementById("inputContent");
+
+    // get number function
     const btnClick = document.getElementById("btnClick");
-    const content = document.getElementById("content");
+    // const content = document.getElementById("content");
 
     btnClick.addEventListener("click", async () => {
         try {
@@ -23,12 +30,40 @@
 
             const data = await response.json();
             console.log(data);
-            content.textContent = data.number;
-            content.style.display = "block";
+            inputContent.value = data.number;
+            // inputContent.style.display = "block";
         } catch (error) {
             console.error("Failed to fetch number:", error);
-            content.textContent = "Failed to load number";
-            content.style.display = "block";
+            inputContent.value = 0;
+            // inputContent.style.display = "block";
+        }
+    });
+
+    // set number function
+    const btnSetContent = document.getElementById("setContent");
+    
+    btnSetContent.addEventListener("click", async() => {
+        const newNumber = inputContent.value;
+
+        try {
+            const response = await fetch("/set_number/", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ number: newNumber })
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+
+            const data = await response.json();
+            console.log(data);
+            alert("Number updated successfully!");
+        } catch (error) {
+            console.error("Failed to set number:", error);
+            alert("Failed to update number");
         }
     });
 </script>

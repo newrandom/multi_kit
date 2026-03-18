@@ -2,7 +2,7 @@ from PySide6.QtWidgets import QApplication, QMainWindow
 from ui.ui_main import Ui_MainWindow
 # from PySide6.QtNetwork import QNetworkAccessManager, QNetworkRequest
 # from PySide6.QtCore import QUrl
-import PySide6.QtAsyncio as QtAsyncio, asyncio, requests, time
+import PySide6.QtAsyncio as QtAsyncio, asyncio, requests, time, random
 
 
 
@@ -31,7 +31,7 @@ class MainWindow(QMainWindow):
             response = requests.get(url)
 
             # to_thread 테스트
-            for _ in range(5):
+            for _ in range(random.randint(3,6)):
                 print("Fetching number...")
                 time.sleep(1)
 
@@ -40,6 +40,12 @@ class MainWindow(QMainWindow):
                 data = response.json()
                 number = data.get("number", "N/A")
                 self.ui.lbStatus.setText(f"Number : {number}")
+
+                # api 호출이 끝나면 set_number 에 0 을 던지기 (초기화)
+                reset_url = "http://127.0.0.1:8000/set_number/"
+                request = requests.post(reset_url, json={"number": random.randint(1,101)})
+                if request.status_code == 200:
+                    print("Number reset to 0 successfully.")
             else:
                 self.ui.lbStatus.setText("Failed to fetch number")
         except Exception as e:
@@ -53,8 +59,8 @@ class MainWindow(QMainWindow):
             # chkCondition이 체크되어 있으면 정기적 루프 진행,
             # 체크되어 있지 않으면 일반 호출
             if self.ui.chkCondition.isChecked():
-                print("Checked: Starting periodic loop")
                 while True:
+                    print("Checked: Starting periodic loop")
                     await self.to_thread_get_number()
                     await asyncio.sleep(5)
                     if not self.ui.chkCondition.isChecked():
