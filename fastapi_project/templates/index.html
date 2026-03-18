@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hello Button</title>
+</head>
+<body>
+    <button id="btnClick">Click Me!</button>
+    <p id="content" style="display: none;">{{content}}</p>
+</body>
+<script>
+    const btnClick = document.getElementById("btnClick");
+    const content = document.getElementById("content");
+
+    btnClick.addEventListener("click", async () => {
+        try {
+            const response = await fetch("/get_number");
+
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+
+            const data = await response.json();
+            console.log(data);
+            content.textContent = data.number;
+            content.style.display = "block";
+        } catch (error) {
+            console.error("Failed to fetch number:", error);
+            content.textContent = "Failed to load number";
+            content.style.display = "block";
+        }
+    });
+</script>
+</html>
