@@ -24,9 +24,9 @@
 
 
 
-# application
+# application [multi_kit root base]
 - fastapi
-    * uvicorn app:app --reload
+    * uvicorn fastapi_project.app:app --reload
 
 - pyside
-    * python load_api.py
+    * python pyside_project/load_api.py
