@@ -14,25 +14,10 @@ class MainWindow(QMainWindow):
 
         self.SIGNAL = None      # api 호출 시그널
 
-        # self.ui.btnRun.clicked.connect(lambda: asyncio.to_thread(self.get_number()))
-        # self.ui.btnRun.clicked.connect(lambda: self.get_number())
-        self.ui.btnRun.clicked.connect(lambda: asyncio.create_task(self.to_thread_get_number()))
+        # self.ui.btnRun.clicked.connect(lambda: asyncio.create_task(self.to_thread_get_number()))
+        self.ui.btnRun.clicked.connect(lambda:asyncio.create_task(self.btnRunClick()))
 
     # api 호출하기
-    # async def get_number(self):
-    #     # url = QUrl("http://127.0.0.1:8000/get_number")
-    #     # request = QNetworkRequest(url)
-    #     # # self.ui.lbStatus.setText(f"Number : {}")
-    #     # print(request)
-    #     url = "http://127.0.0.1:8000/get_number"
-    #     response = await asyncio.to_thread(requests.get, url)
-    #     print(response)
-    #     if response.status_code == 200:
-    #         data = response.json()
-    #         number = data.get("number", "N/A")
-    #         self.ui.lbStatus.setText(f"Number : {number}")
-    #     await asyncio.sleep(1)
-
     async def to_thread_get_number(self):
         # signal 이 None 이면 api 호출, 아니면 호출 하지 않음
         if self.SIGNAL is None:
@@ -50,6 +35,7 @@ class MainWindow(QMainWindow):
                 print("Fetching number...")
                 time.sleep(1)
 
+            print("Fetch complete.")
             if response.status_code == 200:
                 data = response.json()
                 number = data.get("number", "N/A")
@@ -60,6 +46,24 @@ class MainWindow(QMainWindow):
             self.ui.lbStatus.setText(f"Error: {str(e)}")
         finally:
             self.SIGNAL = None
+
+    # 체크가 되어있으면 정기적 loop 호출, 안되어있으면 일반 호출
+    async def btnRunClick(self):
+        if self.SIGNAL is None:
+            # chkCondition이 체크되어 있으면 정기적 루프 진행,
+            # 체크되어 있지 않으면 일반 호출
+            if self.ui.chkCondition.isChecked():
+                print("Checked: Starting periodic loop")
+                while True:
+                    await self.to_thread_get_number()
+                    await asyncio.sleep(5)
+                    if not self.ui.chkCondition.isChecked():
+                        break
+            else:
+                print("Not Checked: Performing single API call")
+                await self.to_thread_get_number()
+        else:
+            print("API call already in progress, skipping...")
 
 if __name__ == "__main__":
     app = QApplication([])

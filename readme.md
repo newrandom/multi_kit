@@ -22,3 +22,11 @@
     * when button clicked, chkCondition value is checked, progress that from postgresql will run automatically.
     * when chkCondition value is not checked, progress that from program will manually.
 
+
+
+# application
+- fastapi
+    * uvicorn app:app --reload
+
+- pyside
+    * python load_api.py
